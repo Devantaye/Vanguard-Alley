@@ -1,93 +1,74 @@
 package game;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.*;
-import javax.swing.*;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Random;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 public class GameMenu extends JPanel implements ActionListener, SettingsChangeListener 
 {
+
     private Timer timer;
-    private JButton playButton, settingsButton, rulesButton, creditsButton, exitButton;
-    private MusicPlayer music = new MusicPlayer();
-    private static GameMenu mainMenu;
-        
+    private JButton playButton, settingsButton, rulesButton, exitButton;
     
- // Maze definition (28 rows x 36 cols, 1 = wall, 0 = path)
-    private final int[][] maze = 
-    {
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,1,1,1,1,1,0,1,0,1,1,1,1,0,1,0,1,0,1,0,1,0,1,1,1,1,0,1,0,1,1,1,1,0,1},
-        {1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,1,0,0,0,1,0,1,0,0,0,0,1,0,1,0,0,0,0,0,0,1},
-        {1,1,1,1,1,0,1,1,1,0,1,1,1,1,0,1,1,1,0,1,0,1,1,1,1,0,1,0,1,1,1,1,1,1,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,0,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1},
-        {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1},
-        {1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1},
-        {1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,1},
-        {1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1},
-        {1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
-        {1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1},
-        {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1},
-        {1,0,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        // Add extra rows here (like a repeat or new paths) to reach ~28 rows
-        {1,0,1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,1,0,1,1,1,1,0,1,1,1,1,1},
-        {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,1},
-        {1,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1},
-        {1,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,1,0,0,0,0,0,1,0,1},
-        {1,0,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1},
-        {1,0,0,1,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0,0,1},
-        {1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,0,1,0,1,0,1,1,1,1,1,0,1,1,1,1,1,0,1,1,0,1},
-        {1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,1},
-        {1,0,1,1,1,1,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,0,1,1,1,1,0,1},
-        {1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-    };
-
-
-    private final int cellSize = 30;
-    private Tank player;
-    private java.util.List<Tank> enemies = new ArrayList<>();
+    private MusicPlayer music = new MusicPlayer();
+    
     private Random rand = new Random();
 
+    // Tank position
+    private int tankX = -100, tankY = 450;
+
+    // Effects
+    private java.util.List<Explosion> explosions   = new ArrayList<>();
+    private java.util.List<SmokeTrail> smokeTrails = new ArrayList<>();
+    private java.util.List<Gunfire> gunfires       = new ArrayList<>();
+    private java.util.List<Cloud> clouds           = new ArrayList<>();
+
+    /** Brightness level 1–10 */
     private int brightnessLevel = 10;
 
     public GameMenu() 
     {
         setLayout(null);
-        
-        if (mainMenu == null)
-        {
-            mainMenu = this;
-        }
-        
-        //music file
-        music.init("res/menu_music.wav");
 
-        // Buttons
-        playButton     = createButton("Play",     300, 200);
-        settingsButton = createButton("Settings", 300, 270);
-        rulesButton    = createButton("Rules",    300, 340);
-        creditsButton  = createButton("Credits",  300, 410);
-        exitButton     = createButton("Exit",     300, 480);
+        // Initialize music
+        // music.init("res/game_music.wav");
+        music.init("res/game_music.wav");
 
-        
+        // Create buttons
+        playButton     = createButton("Play",     300, 180);
+        settingsButton = createButton("Settings", 300, 250);
+        rulesButton    = createButton("Rules",    300, 320);
+        exitButton     = createButton("Exit",     300, 390);
         add(playButton);
         add(settingsButton);
         add(rulesButton);
-        add(creditsButton);
         add(exitButton);
 
-        // Tanks
-        player = new Tank(1, 1, Color.WHITE, true);
-        spawnEnemy();
+        // Generate clouds
+        for (int i = 0; i < 5; i++) 
+        {
+            clouds.add(new Cloud(
+                rand.nextInt(800),
+                rand.nextInt(150)
+            ));
+        }
 
-        // Timer for animation
-        timer = new Timer(200, this);
+        // Start animation timer
+        timer = new Timer(30, this);
         timer.start();
     }
 
@@ -103,8 +84,6 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
 
     private void handleButtonClick(String buttonText) 
     {
-        JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
-
         switch (buttonText) 
         {
             case "Play":
@@ -112,6 +91,7 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
                 break;
 
             case "Settings":
+                JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
                 SettingsDialog dlg = new SettingsDialog(parent, this);
                 dlg.pack();
                 dlg.setLocationRelativeTo(parent);
@@ -119,35 +99,7 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
                 break;
 
             case "Rules":
-                Rules rulesPanel = new Rules(e -> 
-                {
-                    // Go back to the menu
-                    parent.getContentPane().removeAll();
-                    parent.add(mainMenu);
-                    parent.revalidate();
-                    parent.repaint();
-                });
-
-                parent.getContentPane().removeAll();
-                parent.add(rulesPanel);
-                parent.revalidate();
-                parent.repaint();
-                break;
-                
-             case "Credits":
-                Credits creditsPanel = new Credits(e -> 
-                {
-                    // Go back to the menu
-                    parent.getContentPane().removeAll();
-                    parent.revalidate();
-                    parent.add(mainMenu);
-                    parent.repaint();
-                });
-
-                parent.getContentPane().removeAll();
-                parent.add(creditsPanel);
-                parent.revalidate();
-                parent.repaint();
+                System.out.println("Show how to play.");
                 break;
 
             case "Exit":
@@ -155,211 +107,178 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
                 break;
         }
     }
-    
+
+    // === SettingsChangeListener  ===
     @Override
     public void onVolumeChanged(int level) 
     {
         float vol = Math.max(0f, Math.min(1f, level / 10f));
-        music.setVolume(vol);
+        music.setVolume(vol); // Connected to MusicPlayer
+        System.out.println("Volume set to: " + level);
     }
 
     @Override
     public void onBrightnessChanged(int level) 
     {
         brightnessLevel = Math.max(1, Math.min(10, level));
+        System.out.println("Brightness set to: " + brightnessLevel);
+    }
+    // === SettingsChangeListener Over ===
+
+    @Override
+    protected void paintComponent(Graphics g) 
+    {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        // Adjust sky color based on brightness level
+        int baseR = 135, baseG = 206, baseB = 235;
+        float f = brightnessLevel / 10f;
+        int r = (int)(baseR * f), gg = (int)(baseG * f), b = (int)(baseB * f);
+        g2.setColor(new Color(r, gg, b));
+        g2.fillRect(0, 0, getWidth(), getHeight());
+
+        // Floor
+        g2.setColor(new Color(34, 139, 34));
+        g2.fillRect(0, getHeight() - 150, getWidth(), 150);
+
+        // Tank and title
+        drawTank(g2);
+        drawTitle(g2);
+
+        // Effects
+        updateAndDraw(explosions,   g2);
+        updateAndDraw(smokeTrails,  g2);
+        updateAndDraw(gunfires,     g2);
+
+        // Randomly generate new effects
+        if (rand.nextInt(20) == 0) explosions.add(new Explosion());
+        if (rand.nextInt(10) == 0) smokeTrails.add(new SmokeTrail());
+        if (rand.nextInt( 6) == 0) gunfires.add(new Gunfire());
     }
 
-@Override
-protected void paintComponent(Graphics g) 
-{
-    super.paintComponent(g);
-    
-    Graphics2D g2 = (Graphics2D) g;
-
-    // Background brightness
-    float f = brightnessLevel / 10f;
-    g2.setColor(new Color((int)(50 * f), (int)(50 * f), (int)(50 * f)));
-    g2.fillRect(0, 0, getWidth(), getHeight());
-
-    // Calculate dynamic cell size to fit the panel
-    int rows = maze.length;
-    int cols = maze[0].length;
-    int cellWidth = getWidth() / cols;
-    int cellHeight = getHeight() / rows;
-    int cellSize = Math.min(cellWidth, cellHeight); // Keep cells square
-
-    // Draw maze
-    for (int r = 0; r < rows; r++) 
+    private <T extends Effect> void updateAndDraw(java.util.List<T> list, Graphics2D g) 
     {
-        for (int c = 0; c < cols; c++) 
+        for (Iterator<T> it = list.iterator(); it.hasNext(); ) 
         {
-            if (maze[r][c] == 1) 
-            {
-                g2.setColor(Color.DARK_GRAY);
-            } 
-            else 
-            {
-                g2.setColor(Color.BLACK);
-            }
-            g2.fillRect(c * cellSize, r * cellSize, cellSize, cellSize);
+            T e = it.next();
+            e.update();
+            e.draw(g);
+            if (e.isDone()) it.remove();
         }
     }
 
-    // Draw tanks
-    player.draw(g2, cellSize);
-    for (Tank e : enemies) e.draw(g2, cellSize);
-
-    // Draw Title
-    String title = "VANGUARD ALLEY";
-    Font font = new Font("Monospaced", Font.BOLD, 48);
-    g2.setFont(font);
-    g2.setColor(Color.GREEN.darker());
-
-    FontMetrics fm = g2.getFontMetrics(font);
-    int textWidth = fm.stringWidth(title);
-
-    // Center horizontally
-    int x = (getWidth() - textWidth) / 2;
-
-    // Position vertically just above Play button
-    int playButtonY = 150;   // <<< change this to your actual Play button Y
-    int gap = 20;            // distance between title and Play button
-    int y = playButtonY - gap;
-
-    // Draw
-    g2.drawString(title, x, y);
-
-}
-
-
-
-@Override
-public void actionPerformed(ActionEvent e) 
-{
-    // Move player randomly
-    player.randomMove();
-
-    // Move enemies toward player
-    for (Tank enemy : enemies) 
+    private void drawTitle(Graphics2D g2) 
     {
-        enemy.chase(player);
-        // Check collision
-        if (enemy.row == player.row && enemy.col == player.col) 
+        String title = "IRON VANGUARD"; //Name of game
+        Font font = new Font("Monospaced", Font.BOLD, 48);
+        g2.setFont(font);
+        
+        g2.setRenderingHint
+        (
+            RenderingHints.KEY_TEXT_ANTIALIASING,
+            RenderingHints.VALUE_TEXT_ANTIALIAS_ON
+        );
+        FontMetrics fm = g2.getFontMetrics(font);
+        int w = fm.stringWidth(title), x = (getWidth() - w) / 2, y = 100;
+        g2.setColor(Color.DARK_GRAY);
+        g2.drawString(title, x + 3, y + 3);
+        g2.setColor(Color.GREEN.darker());
+        g2.drawString(title, x, y);
+    }
+
+    private void drawTank(Graphics2D g) 
+    {
+        g.setColor(new Color(60, 80, 60));
+        g.fillRect(tankX, tankY, 100, 30);
+        g.fillRect(tankX + 20, tankY - 20, 60, 20);
+        g.fillRect(tankX + 75, tankY - 15, 30, 5);
+        g.setColor(Color.BLACK);
+        for (int i = 0; i < 5; i++) 
         {
-            respawnPlayer();
-            break; // only need to respawn once
+            g.fillOval(tankX + i * 20, tankY + 25, 15, 15);
         }
     }
 
-    // Occasionally spawn new enemy
-    if (rand.nextInt(30) == 0 && enemies.size() < 5) 
+    @Override
+    public void actionPerformed(ActionEvent e) 
     {
-        spawnEnemy();
-    }
-
-    repaint();
-}
-
-private void respawnPlayer() 
-{
-    int r, c;
-    
-    do 
-    {
-        r = rand.nextInt(maze.length);
-        c = rand.nextInt(maze[0].length);
-    } 
-    while (maze[r][c] == 1);  // ensure not a wall
-    
-    player.row = r;
-    player.col = c;
-}
-
-
-
-    private void spawnEnemy() 
-    {
-        int r, c;
-        
-        do 
+        tankX += 2;
+        if (tankX > getWidth()) tankX = -120;
+        for (Cloud c : clouds) 
         {
-            r = rand.nextInt(maze.length);
-            c = rand.nextInt(maze[0].length);
-        } 
-        while (maze[r][c] == 1 || (r == 1 && c == 1));
-        
-        enemies.add(new Tank(c, r, Color.RED, false));
+            c.x -= 1;
+            if (c.x < -100) c.x = getWidth();
+        }
+        repaint();
     }
 
     public static void main(String[] args) 
     {
-        JFrame frame = new JFrame("Vanguard Alley");
-        GameMenu mainMenu = new GameMenu();
-        frame.add(mainMenu);
+        JFrame frame = new JFrame("Iron Vanguard");
+        GameMenu menu = new GameMenu();
+        frame.add(menu);
         frame.setSize(800, 600);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setResizable(false);
         frame.setVisible(true);
     }
 
-    // ================= Tank Class =================
-    private class Tank 
+
+    //Effects for Animation in background
+    private abstract class Effect 
     {
-        int col, row;
-        Color color;
-        boolean isPlayer;
+        abstract void update();
+        abstract void draw(Graphics2D g);
+        abstract boolean isDone();
+    }
 
-        Tank(int col, int row, Color color, boolean isPlayer) 
+    public class Explosion extends Effect 
+    {
+        int x = rand.nextInt(800), y = rand.nextInt(300) + 100;
+        int radius = 10, max = 30;
+        boolean done = false;
+        void update() { radius += 2; if (radius > max) done = true; }
+        
+        void draw(Graphics2D g) 
         {
-            this.col = col;
-            this.row = row;
-            this.color = color;
-            this.isPlayer = isPlayer;
+            g.setColor(new Color(255, rand.nextInt(100), 0, 180));
+            g.fillOval(x - radius/2, y - radius/2, radius, radius);
         }
+        boolean isDone() { return done; }
+    }
 
-        void draw(Graphics2D g2, int cellSize) 
+    public class SmokeTrail extends Effect 
+    {
+        int x = rand.nextInt(800), y = rand.nextInt(200) + 250;
+        int size = 20, alpha = 200;
+        void update() { y -= 1; alpha -= 4; }
+        
+        void draw(Graphics2D g) 
         {
-            g2.setColor(color);
-            g2.fillRect(col * cellSize + cellSize / 6, row * cellSize + cellSize / 6, 
-                        cellSize * 2 / 3, cellSize * 2 / 3);
+            g.setColor(new Color(120, 120, 120, Math.max(0, alpha)));
+            g.fillOval(x, y, size, size);
         }
+        boolean isDone() { return alpha <= 0; }
+    }
 
-        void randomMove() 
+    public class Gunfire extends Effect 
+    {
+        int x = rand.nextInt(800), y = rand.nextInt(200) + 150;
+        int length = 40;
+        void update() { length -= 5; }
+        
+        void draw(Graphics2D g) 
         {
-            int[][] dirs = {{0,-1},{1,0},{0,1},{-1,0}};
-
-            Collections.shuffle(Arrays.asList(dirs));
-
-            for (int[] d : dirs) 
-            {
-                int nr = row + d[1], nc = col + d[0];
-                if (maze[nr][nc] == 0) { row = nr; col = nc; break; }
-            }
+            g.setColor(Color.YELLOW);
+            g.drawLine(x, y, x, y - length);
         }
+        boolean isDone() { return length <= 0; }
+    }
 
-        void chase(Tank target) 
-        {
-            if (Math.abs(target.row - row) > Math.abs(target.col - col)) 
-            {
-                row += Integer.signum(target.row - row);
-            } 
-            else 
-            {
-                col += Integer.signum(target.col - col);
-            }
-
-            if (maze[row][col] == 1) 
-            {
-                // Undo if hit wall
-                if (Math.abs(target.row - row) > Math.abs(target.col - col)) 
-                {
-                    row -= Integer.signum(target.row - row);
-                } 
-                else 
-                {
-                    col -= Integer.signum(target.col - col);
-                }
-            }
-        }
+    static class Cloud 
+    {
+        int x, y;
+        Cloud(int x, int y) { this.x = x; this.y = y; }
     }
 }
