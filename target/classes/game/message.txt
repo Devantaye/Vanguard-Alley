@@ -1,0 +1,127 @@
+package com.example.gamemenu;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+/**
+ *
+ * @author rocka
+ */
+public class GameMenu extends JPanel implements ActionListener 
+{
+    private Timer timer;
+    private int backgroundY = 0;
+    private JButton playButton, settingsButton, RulesButton, exitButton;
+
+    public GameMenu() 
+    {
+        setLayout(null);  // Manual layout
+
+        // Setup buttons
+        playButton = createButton("Play", 300, 180);
+        settingsButton = createButton("Settings", 300, 250);
+        RulesButton = createButton("Rules", 300, 320);
+        exitButton = createButton("Exit", 300, 390);
+
+        add(playButton);
+        add(settingsButton);
+        add(RulesButton);
+        add(exitButton);
+
+        // Background animation timer
+        timer = new Timer(30, this);
+        timer.start();
+    }
+
+    private JButton createButton(String text, int x, int y) 
+    {
+        JButton button = new JButton(text);
+        button.setBounds(x, y, 200, 50);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Arial", Font.BOLD, 20));
+        button.addActionListener(e -> handleButtonClick(text));
+        return button;
+    }
+
+    private void handleButtonClick(String buttonText) 
+    {
+        switch (buttonText) 
+        {
+            case "Play":
+                System.out.println("Play the game!");
+                break;
+            case "Settings":
+                System.out.println("Open settings.");
+                break;
+            case "Rules":
+                System.out.println("Show how to play.");
+                break;
+            case "Exit":
+                System.exit(0);
+                break;
+        }
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) 
+    {
+        super.paintComponent(g);
+
+        // Animated background
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, getWidth(), getHeight());
+
+        g.setColor(Color.WHITE);
+        
+        for (int i = 0; i < 50; i++) 
+        {
+            int x = (int)(Math.random() * getWidth());
+            int y = (backgroundY + i * 30) % getHeight();
+            g.fillOval(x, y, 2, 2);
+        }
+
+        backgroundY += 1;
+
+        // Draw Game Title
+        Graphics2D g2d = (Graphics2D) g;
+        String title = "ARMS OF TANKS";
+        Font titleFont = new Font("Serif", Font.BOLD, 48);
+        g2d.setFont(titleFont);
+
+        // Anti-aliasing for smooth text
+        g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,
+                             RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+
+        // Measure the width of the string
+        FontMetrics fm = g2d.getFontMetrics(titleFont);
+        int titleWidth = fm.stringWidth(title);
+
+        int x = (getWidth() - titleWidth) / 2;
+        int y = 100;
+
+        // Shadow/Glow effect
+        g2d.setColor(Color.DARK_GRAY);
+        g2d.drawString(title, x + 2, y + 2);
+
+        // Title text
+        g2d.setColor(Color.YELLOW);
+        g2d.drawString(title, x, y);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) 
+    {
+        repaint(); // Continuously repaint for animation
+    }
+
+    public static void main(String[] args) 
+    {
+        JFrame frame = new JFrame("Arms of Tanks");
+        GameMenu menu = new GameMenu();
+        frame.add(menu);
+        frame.setSize(800, 600);
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setResizable(false);
+        frame.setVisible(true);
+    }
+}

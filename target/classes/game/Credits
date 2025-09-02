@@ -1,0 +1,83 @@
+package com.example.gamemenu;
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.util.Arrays;
+import java.util.List;
+
+public class Credits extends JPanel 
+{
+    private JButton backButton;
+
+    public Credits(ActionListener onBack) 
+    {
+        setPreferredSize(new Dimension(800, 600));
+        setLayout(null); // custom layout so we can position button
+
+        // Back button
+        backButton = new JButton("Back to Menu");
+        backButton.setBounds(320, 500, 160, 40);
+        backButton.addActionListener(onBack);
+        add(backButton);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) 
+    {
+        super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D) g;
+
+        // Background - Armory style
+        g2.setColor(new Color(70, 70, 70)); // dark gray walls
+        g2.fillRect(0, 0, getWidth(), getHeight());
+
+        // Steel plating effect (vertical lines like walls/panels)
+        g2.setColor(new Color(100, 100, 100));
+        
+        for (int x = 0; x < getWidth(); x += 80) 
+        {
+            g2.fillRect(x, 0, 5, getHeight());
+        }
+
+        // Weapons silhouette effect
+        g2.setColor(new Color(40, 40, 40));
+        g2.fillRect(650, 300, 100, 20); // rifle stock
+        g2.fillRect(730, 280, 20, 60);  // vertical part
+        g2.fillRect(680, 250, 100, 20); // barrel
+
+        // Header
+        g2.setColor(Color.GREEN);
+        g2.setFont(new Font("Monospaced", Font.BOLD, 36));
+        g2.drawString("CREDITS", 330, 80);
+
+        // Rules text
+        g2.setFont(new Font("Arial", Font.PLAIN, 18));
+        g2.setColor(Color.RED);
+        List<String> rules = Arrays.asList
+        (
+            "Hand Gesture Control: Shayne and Yunsu",
+            "Tank Game Creation: Devante and Leo",
+            "Tank Game Menu Creation: Frank and Kanak"
+        );
+
+        int y = 150;
+        
+        for (String rule : rules) 
+        {
+            g2.drawString(rule, 100, y);
+            y += 40;
+        }
+    }
+
+    // For quick testing
+    public static void main(String[] args) 
+    {
+        JFrame frame = new JFrame("Credits");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.add(new Credits(e -> System.out.println("Back clicked")));
+        frame.pack();
+        frame.setLocationRelativeTo(null);
+        frame.setVisible(true);
+    }
+}
