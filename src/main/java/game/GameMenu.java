@@ -78,7 +78,7 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
         }
         
         //music file
-        music.init("res/menu_music.wav");
+        music.initResource("/audio/menu_music.wav");
 
         // Buttons
         playButton     = createButton("Play",     300, 200);
@@ -116,6 +116,7 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
     private void handleButtonClick(String buttonText) 
     {
         JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
+        ClickSound.play();
 
         switch (buttonText) 
         {
