@@ -23,7 +23,6 @@
             "request": "launch",
             "mainClass": "game.TankMazeGame",
             "projectName": "TankPrototype",
-            "vmArgs": "--enable-native-access=ALL-UNNAMED"
         }
     ]
 }
