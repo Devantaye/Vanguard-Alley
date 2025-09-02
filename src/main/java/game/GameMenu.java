@@ -116,7 +116,6 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
     private void handleButtonClick(String buttonText) 
     {
         JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
-        ClickSound.play();
 
         switch (buttonText) 
         {
