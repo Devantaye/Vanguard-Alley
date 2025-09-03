@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TankMazeGame",
+            "request": "launch",
+            "mainClass": "game.app.TankMazeGame",
+            "projectName": "TankPrototype"
+        },
+        {
+            "type": "java",
             "name": "GameMenu",
             "request": "launch",
             "mainClass": "game.GameMenu",
@@ -22,7 +29,7 @@
             "name": "TankMazeGame",
             "request": "launch",
             "mainClass": "game.TankMazeGame",
-            "projectName": "TankPrototype",
+            "projectName": "TankPrototype"
         }
     ]
 }
