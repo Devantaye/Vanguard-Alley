@@ -10,7 +10,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JPanel;
 
-@SuppressWarnings("unused")
+
 public class SettingsDialog extends JDialog {
     public SettingsDialog(Frame owner, SettingsChangeListener listener) {
         super(owner, "Settings", true);

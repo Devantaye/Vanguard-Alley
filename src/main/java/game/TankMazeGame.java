@@ -61,7 +61,6 @@ public class TankMazeGame {
     private Player player;
     private GameRenderer renderer;
     private FontRenderer fontRenderer;
-    private MenuRenderer menuRenderer;
     private WinRenderer winRenderer;
     private LoseRenderer loseRenderer;
     private LevelRenderer levelRenderer;
@@ -105,12 +104,14 @@ public class TankMazeGame {
         initWindow();
 
         fontRenderer = new FontRenderer();
-        menuRenderer = new MenuRenderer(fontRenderer);
         winRenderer = new WinRenderer(fontRenderer);
         loseRenderer = new LoseRenderer(fontRenderer);
         levelRenderer = new LevelRenderer(fontRenderer);
 
-        state = GameState.MENU;
+        state = GameState.PLAYING;
+        currentLevel = 1;
+        startNewGame(currentLevel);
+
         double lastTime = glfwGetTime();
 
         while (!glfwWindowShouldClose(window)) {
@@ -191,10 +192,6 @@ public class TankMazeGame {
                 glMatrixMode(GL_MODELVIEW);
 
                 switch (state) {
-                    case MENU:
-                        menuRenderer.render();
-                        handleMenu();
-                        break;
                     case WIN:
                         winRenderer.render();
                         handleWin();
@@ -264,6 +261,8 @@ public class TankMazeGame {
         }
     }
 
+    
+
     // ──────────────────────────────────────────────
     // Game start logic
     // ──────────────────────────────────────────────
@@ -320,26 +319,27 @@ public class TankMazeGame {
     // ────────────────────────────────────────────────
     // Input Handlers
     // ────────────────────────────────────────────────
-    private void handleMenu() {
-        if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-            currentLevel = 1;
-            startNewGame(currentLevel);
-        }
-        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            glfwSetWindowShouldClose(window, true);
-    }
-
     private void handleGame() {
-        boolean left  = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS || gestures.isLeft();
-        boolean right = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS || gestures.isRight();
-        boolean up    = glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || gestures.isUp();
-        boolean down  = glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS || gestures.isDown();
+        boolean left  = (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+                        || (gestures != null && gestures.isLeft());
+        boolean right = (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+                        || (gestures != null && gestures.isRight());
+        boolean up    = (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+                        || (gestures != null && gestures.isUp());
+        boolean down  = (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+                        || (gestures != null && gestures.isDown());
 
-        // Choose one direction to avoid double-steps; tweak priority if you like
+        // allow exit in-game
+        if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+            glfwSetWindowShouldClose(window, true);
+            return;
+        }
+
+        // Choose one direction (prevents double-stepping)
         int dx = 0, dy = 0;
-        if (left)  { dx = -1; dy = 0; }
-        else if (right) { dx =  1; dy = 0; }
-        else if (up)    { dx =  0; dy = 1; }
+        if (left)       { dx = -1; dy =  0; }
+        else if (right) { dx =  1; dy =  0; }
+        else if (up)    { dx =  0; dy =  1; }
         else if (down)  { dx =  0; dy = -1; }
 
         double now = glfwGetTime();
@@ -361,6 +361,7 @@ public class TankMazeGame {
             lastShootTime = now;
         }
     }
+
 
     private void handleWin() {
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {

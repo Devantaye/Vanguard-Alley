@@ -15,11 +15,11 @@ public class Enemy {
     private   float shootInterval    = 1f;
 
     // ── Stats & movement ──────────────────────────────────────────────────
-    private int   health     = 1;
-    protected int maxHealth;      // stores the max HP for this enemy
-    private float speed      = 0.32f;
-    private float chaseRange;    // in world-units = cells * cellSize
-    private float shootRange;    // in world-units = cells * cellSize
+    private int   health     = 1;     //only adjusts for default enemies (Level 1)
+    private float speed      = 0.22f;  //only adjusts for default enemies (Level 1)
+    protected int maxHealth;     
+    private float chaseRange;   
+    private float shootRange;   
 
     // ── Facing direction ───────────────────────────────────────────────────
     private Direction direction = Direction.DOWN;
@@ -53,8 +53,15 @@ public class Enemy {
     }
 
     public Enemy(float startX, float startY, int[][] maze) {
-        this(startX, startY, maze, 1, 0.32f, 4f * (2f / maze.length), 3f * (2f / maze.length));
-    }
+    this.position = new Vector2f(startX, startY);
+    this.maze     = maze;
+    this.rows     = maze.length;
+    this.cellSize = 2f / rows;
+    this.size     = cellSize * 0.2f;
+    this.maxHealth = this.health;
+    this.chaseRange = 4f * cellSize;
+    this.shootRange = 3f * cellSize;
+}
 
     /** Actively chase the player at all times; shoot when in range. */
     public void update(float dt, Player player, List<Bullet> outBullets) {
@@ -191,6 +198,9 @@ public class Enemy {
     }
 
     // ── Setters for rendering and AI ───────────────────────────────────────
+    public float getSpeed()        { return speed; }
+    public void  setSpeed(float s) { this.speed = s; }
+    public void  setHealth(int h)  { this.health = this.maxHealth = h; }
     public void setShootInterval(float interval) {
         this.shootInterval = interval;
     }
