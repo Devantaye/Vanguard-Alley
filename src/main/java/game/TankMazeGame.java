@@ -394,6 +394,8 @@ public class TankMazeGame {
     }
 
     public static void main(String[] args) throws IOException {
-        new TankMazeGame().run();
+        boolean start = PrelaunchMenu.showAndWait();
+        if (!start) return;         // user closed menu
+        new TankMazeGame().run();   // now GLFW + webcam start
     }
 }
