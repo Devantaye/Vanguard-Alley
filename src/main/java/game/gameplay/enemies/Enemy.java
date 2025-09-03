@@ -1,11 +1,15 @@
-package game.gameplay;
+package game.gameplay.enemies;
 
 import java.util.Collections;
 import java.util.List;
 
 import org.joml.Vector2f;
 
+import game.gameplay.Bullet;
+import game.gameplay.PathFinder;
+import game.gameplay.Player;
 import game.gameplay.Player.Direction;
+import game.app.GameConfig;
 
 public class Enemy {
     public enum State { ROAMING, CHASING, SHOOTING }
@@ -53,15 +57,17 @@ public class Enemy {
     }
 
     public Enemy(float startX, float startY, int[][] maze) {
-    this.position = new Vector2f(startX, startY);
-    this.maze     = maze;
-    this.rows     = maze.length;
-    this.cellSize = 2f / rows;
-    this.size     = cellSize * 0.2f;
-    this.maxHealth = this.health;
-    this.chaseRange = 4f * cellSize;
-    this.shootRange = 3f * cellSize;
-}
+        this(
+            startX, startY, maze,
+            GameConfig.ENEMY_NORMAL_HEALTH,
+            GameConfig.ENEMY_NORMAL_SPEED,
+            GameConfig.cellsToWorld(GameConfig.ENEMY_NORMAL_CHASE_CELLS),
+            GameConfig.cellsToWorld(GameConfig.ENEMY_NORMAL_SHOOT_CELLS)
+        );
+        this.setShootInterval((float) GameConfig.ENEMY_NORMAL_FIRE_COOLDOWN);
+        this.setCustomSize(GameConfig.ENEMY_NORMAL_SIZE_SCALE);
+    }
+
 
     /** Actively chase the player at all times; shoot when in range. */
     public void update(float dt, Player player, List<Bullet> outBullets) {
@@ -125,7 +131,7 @@ public class Enemy {
                 : (diff.y > 0 ? Direction.UP    : Direction.DOWN);
 
             outBullets.add(new Bullet(
-                position.x, position.y, shootDir, maze, rows
+                position.x, position.y, shootDir, maze, rows, GameConfig.ENEMY_BULLET_SPEED
             ));
         }
     }

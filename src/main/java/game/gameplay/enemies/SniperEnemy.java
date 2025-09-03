@@ -1,43 +1,47 @@
-package game.gameplay;
+package game.gameplay.enemies;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import game.app.GameConfig;
+import game.gameplay.Bullet;
+import game.gameplay.Player;
 import game.gameplay.Player.Direction;
 
 public class SniperEnemy extends Enemy {
 
-    // Shared global scanning state for all snipers
+    // Global scan state (unchanged)
     private static float GLOBAL_SCAN_TIMER = 0f;
     private static final float SCAN_INTERVAL = 7f;
     private static int GLOBAL_DIRECTION_INDEX = 0;
 
-    // Shooting behavior
-    private final float AIM_DELAY = 0.5f;      // charge-up before firing
-    private final float SHOOT_COOLDOWN = 8f; // cooldown between shots
+    // Behavior (use config for cooldown; keep aim delay here or add a constant)
+    private static final float AIM_DELAY = 0.5f;
+    private static final float SHOOT_COOLDOWN = (float) GameConfig.ENEMY_SNIPER_FIRE_COOLDOWN;
 
     private float aimTimer = 0f;
     private boolean isAiming = false;
 
-    // Per-sniper local data
     private final List<Direction> watchDirections = new ArrayList<>();
 
     public SniperEnemy(float x, float y, int[][] maze) {
-        super(x, y, maze,
-              1, 0f,   // health: 1, no movement
-              10f * (2f / maze.length), // large chase range (unused)
-              10f * (2f / maze.length)  // large shoot range
+        super(
+            x, y, maze,
+            GameConfig.ENEMY_SNIPER_HEALTH,
+            GameConfig.ENEMY_SNIPER_SPEED, // 0 => stationary, still fine
+            GameConfig.cellsToWorld(GameConfig.ENEMY_SNIPER_CHASE_CELLS),
+            GameConfig.cellsToWorld(GameConfig.ENEMY_SNIPER_SHOOT_CELLS)
         );
+        this.setShootInterval((float) GameConfig.ENEMY_SNIPER_FIRE_COOLDOWN);
+        this.setCustomSize(GameConfig.ENEMY_SNIPER_SIZE_SCALE);
 
-        // Detect open corridors around spawn cell
+        // Detect open corridors around spawn
         int er = (int)((1 - y) / (2f / maze.length));
         int ec = (int)((x + 1) / (2f / maze.length));
         if (isOpen(er - 1, ec, maze)) watchDirections.add(Direction.UP);
         if (isOpen(er + 1, ec, maze)) watchDirections.add(Direction.DOWN);
         if (isOpen(er, ec - 1, maze)) watchDirections.add(Direction.LEFT);
         if (isOpen(er, ec + 1, maze)) watchDirections.add(Direction.RIGHT);
-
-        // Default direction
         if (watchDirections.isEmpty()) watchDirections.add(Direction.UP);
         setDirection(watchDirections.get(0));
     }
@@ -131,7 +135,7 @@ public class SniperEnemy extends Enemy {
 
     // ✅ Custom sniper bullet
     private Bullet createSniperBullet() {
-        return new Bullet(getX(), getY(), getDirection(), getMaze(), getMazeRows(), 4.2f, 0.6f);
+        return new Bullet(getX(), getY(), getDirection(), getMaze(), getMazeRows(), GameConfig.SNIPER_BULLET_SPEED, GameConfig.SNIPER_BULLET_SIZE);
     }
 }
 

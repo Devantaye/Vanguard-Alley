@@ -11,12 +11,12 @@ import static org.lwjgl.opengl.GL11.glTranslatef;
 import static org.lwjgl.opengl.GL11.glVertex2f;
 
 import game.app.GameState;
-import game.gameplay.Enemy;
-import game.gameplay.MiniEnemy;
 import game.gameplay.Player;
-import game.gameplay.SniperEnemy;
-import game.gameplay.TankEnemy;
 import game.gameplay.Player.Direction;
+import game.gameplay.enemies.Enemy;
+import game.gameplay.enemies.MiniEnemy;
+import game.gameplay.enemies.SniperEnemy;
+import game.gameplay.enemies.TankEnemy;
 
 public class GameRenderer {
 

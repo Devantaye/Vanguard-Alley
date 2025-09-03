@@ -47,12 +47,9 @@ import org.lwjgl.system.MemoryUtil;
 
 import game.audio.AudioPlayer;
 import game.gameplay.Bullet;
-import game.gameplay.Enemy;
 import game.gameplay.MazeGenerator;
-import game.gameplay.MiniEnemy;
 import game.gameplay.Player;
-import game.gameplay.SniperEnemy;
-import game.gameplay.TankEnemy;
+import game.gameplay.enemies.Enemy;
 import game.input.GestureManager;
 import game.render.FontRenderer;
 import game.render.GameRenderer;
@@ -60,6 +57,9 @@ import game.render.LevelRenderer;
 import game.render.LoseRenderer;
 import game.render.WinRenderer;
 import game.ui.menu.PrelaunchMenu;
+import game.gameplay.enemies.EnemyType;
+import game.gameplay.enemies.EnemySpawning;
+
 
 public class TankMazeGame {
 
@@ -67,9 +67,6 @@ public class TankMazeGame {
 
     // Window properties
     private long window;
-    private final int width = 800;
-    private final int height = 800;
-    private final int rows = 21; // must be odd
 
     // Game components
     private MazeGenerator generator;
@@ -89,28 +86,15 @@ public class TankMazeGame {
     private final Random rand = new Random();
 
     // Shooting
-    private final double shootCooldown = 0.5;
     private double lastShootTime = 0.0;
 
     // Level progression
     private int currentLevel = 1;
-    private final int maxLevel = 5;
-    private final int enemyCount = 2; // base enemies
-
-    // Background colors by level
-    private final float[][] backgroundColors = {
-        {0.1f, 0.1f, 0.1f},
-        {0.05f, 0.1f, 0.2f},
-        {0.1f, 0.05f, 0.15f},
-        {0.1f, 0.05f, 0.02f},
-        {0.02f, 0.1f, 0.05f}
-    };
 
     // NEW: Multithreaded gesture system
     private GestureManager gestures;
 
     // NEW: Movement cadence (grid step every moveInterval seconds while held)
-    private final double moveInterval = 0.10;  // tweak 0.10–0.18 to taste
     private double lastMoveTime = 0.0;
 
     // ──────────────────────────────────────────────
@@ -135,7 +119,8 @@ public class TankMazeGame {
             float dt = (float) (now - lastTime);
             lastTime = now;
 
-            float[] bg = backgroundColors[Math.min(currentLevel - 1, backgroundColors.length - 1)];
+            float[] bg = GameConfig.BG_COLORS[Math.min(currentLevel - 1, GameConfig.BG_COLORS.length - 1)];
+
             glClearColor(bg[0], bg[1], bg[2], 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
 
@@ -204,7 +189,7 @@ public class TankMazeGame {
                 // UI states
                 glMatrixMode(GL_PROJECTION);
                 glLoadIdentity();
-                glOrtho(0, width, height, 0, -1, 1);
+                glOrtho(0, GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT, 0, -1, 1);
                 glMatrixMode(GL_MODELVIEW);
 
                 switch (state) {
@@ -219,7 +204,7 @@ public class TankMazeGame {
                     case LEVEL_COMPLETE:
                         glMatrixMode(GL_PROJECTION);
                         glLoadIdentity();
-                        glOrtho(0, width, height, 0, -1, 1);
+                        glOrtho(0, GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT, 0, -1, 1);
                         glMatrixMode(GL_MODELVIEW);
                         levelRenderer.render(currentLevel);
                         handleLevelComplete();
@@ -246,16 +231,16 @@ public class TankMazeGame {
 
         if (!glfwInit()) throw new IllegalStateException("Failed to init GLFW");
 
-        window = glfwCreateWindow(width, height, "Tank Maze Game", MemoryUtil.NULL, MemoryUtil.NULL);
+        window = glfwCreateWindow(GameConfig.WINDOW_WIDTH, GameConfig.WINDOW_HEIGHT, "Tank Maze Game", MemoryUtil.NULL, MemoryUtil.NULL);
         if (window == MemoryUtil.NULL) throw new RuntimeException("Window creation failed");
 
         GLFWVidMode vid = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        if (vid != null) glfwSetWindowPos(window, (vid.width() - width) / 2, (vid.height() - height) / 2);
+        if (vid != null) glfwSetWindowPos(window, (vid.width() - GameConfig.WINDOW_WIDTH) / 2, (vid.height() - GameConfig.WINDOW_HEIGHT) / 2);
 
         glfwMakeContextCurrent(window);
         GL.createCapabilities();
 
-        new AudioPlayer("audio/music.wav").play();
+        if (GameConfig.SOUND_ON) new AudioPlayer(GameConfig.MUSIC_PATH).play();
 
         glfwSwapInterval(1);
         glfwShowWindow(window);
@@ -283,54 +268,58 @@ public class TankMazeGame {
     // Game start logic
     // ──────────────────────────────────────────────
     private void startNewGame(int level) {
-        generator = new MazeGenerator(rows, rows);
-        maze = generator.getMaze();
-        player = new Player(maze, rows);
-        renderer = new GameRenderer(maze, player, fontRenderer);
+    generator = new MazeGenerator(GameConfig.MAZE_ROWS, GameConfig.MAZE_ROWS);
+    maze = generator.getMaze();
+    player = new Player(maze, GameConfig.MAZE_ROWS);
+    renderer = new GameRenderer(maze, player, fontRenderer);
 
-        bullets.clear();
-        enemyBullets = new ArrayList<>();
-        lastShootTime = 0;
-        enemies = new ArrayList<>();
+    bullets.clear();
+    enemyBullets = new ArrayList<>();
+    lastShootTime = 0;
+    enemies = new ArrayList<>();
 
-        float cellSize = 2f / rows;
-        float margin = cellSize * 6;
+    final int rows = GameConfig.MAZE_ROWS;
+    final float cellSize = GameConfig.cellSize();
+    final float margin = GameConfig.cellsToWorld(6f);
 
-        int levelEnemyCount = (level == 5) ? 12 : enemyCount + level;
+    int levelEnemyCount = (level == GameConfig.MAX_LEVEL)
+        ? GameConfig.FINAL_LEVEL_BONUS_COUNT
+        : GameConfig.BASE_ENEMY_COUNT + level;
 
-        int normalCount = 0, miniCount = 0, sniperCount = 0, tankCount = 0;
+    int normalCount = 0, miniCount = 0, sniperCount = 0, tankCount = 0;
 
-        for (int i = 0; i < levelEnemyCount; i++) {
-            int er, ec;
-            float ex, ey;
-            do {
-                er = rand.nextInt(rows - 2) + 1;
-                ec = rand.nextInt(rows - 2) + 1;
-                ex = -1 + ec * cellSize + cellSize / 2f;
-                ey = 1 - er * cellSize - cellSize / 2f;
-            } while (Math.hypot(ex - player.getX(), ey - player.getY()) < margin || maze[er][ec] == 1);
+    for (int i = 0; i < levelEnemyCount; i++) {
+        int er, ec;
+        float ex, ey;
+        do {
+            er = rand.nextInt(rows - 2) + 1;
+            ec = rand.nextInt(rows - 2) + 1;
+            ex = -1 + ec * cellSize + cellSize / 2f;
+            ey =  1 - er * cellSize - cellSize / 2f;
+        } while (Math.hypot(ex - player.getX(), ey - player.getY()) < margin || maze[er][ec] == 1);
 
-            Enemy enemy;
-            switch (level) {
-                case 1:  enemy = new Enemy(ex, ey, maze); break;
-                case 2:  enemy = new TankEnemy(ex, ey, maze); break;
-                case 3:  enemy = new MiniEnemy(ex, ey, maze); break;
-                case 4:  enemy = new SniperEnemy(ex, ey, maze); break;
-                default:
-                    while (true) {
-                        int type = rand.nextInt(4);
-                        if (type == 0 && normalCount < 3) { enemy = new Enemy(ex, ey, maze); normalCount++; break; }
-                        if (type == 1 && miniCount   < 3) { enemy = new MiniEnemy(ex, ey, maze);  miniCount++;  break; }
-                        if (type == 2 && sniperCount < 3) { enemy = new SniperEnemy(ex, ey, maze); sniperCount++; break; }
-                        if (type == 3 && tankCount   < 3) { enemy = new TankEnemy(ex, ey, maze);   tankCount++;  break; }
-                    }
-                    break;
-            }
-            enemies.add(enemy);
+        EnemyType type;
+        switch (level) {
+            case 1:  type = EnemyType.NORMAL; break;
+            case 2:  type = EnemyType.TANK;   break;
+            case 3:  type = EnemyType.MINI;   break;
+            case 4:  type = EnemyType.SNIPER; break;
+            default:
+                while (true) {
+                    int t = rand.nextInt(4);
+                    if (t == 0 && normalCount < 3) { type = EnemyType.NORMAL; normalCount++; break; }
+                    if (t == 1 && miniCount   < 3) { type = EnemyType.MINI;   miniCount++;   break; }
+                    if (t == 2 && sniperCount < 3) { type = EnemyType.SNIPER; sniperCount++; break; }
+                    if (t == 3 && tankCount   < 3) { type = EnemyType.TANK;   tankCount++;   break; }
+                }
         }
 
-        state = GameState.PLAYING;
+        enemies.add(EnemySpawning.create(type, ex, ey, maze));
     }
+
+    state = GameState.PLAYING;
+}
+
 
     // ────────────────────────────────────────────────
     // Input Handlers
@@ -359,20 +348,20 @@ public class TankMazeGame {
         else if (down)  { dx =  0; dy = -1; }
 
         double now = glfwGetTime();
-        if ((dx != 0 || dy != 0) && now - lastMoveTime >= moveInterval) {
+        if ((dx != 0 || dy != 0) && now - lastMoveTime >= GameConfig.MOVE_INTERVAL) {
             player.move(dx, dy);
             lastMoveTime = now;
         }
 
         if (enemies.isEmpty() && player.reachedGoal()) {
-            state = (currentLevel < maxLevel) ? GameState.LEVEL_COMPLETE : GameState.WIN;
+            state = (currentLevel < GameConfig.MAX_LEVEL) ? GameState.LEVEL_COMPLETE : GameState.WIN;
         }
 
         if (glfwGetKey(window, GLFW_KEY_N) == GLFW_PRESS) {
-            state = (currentLevel < maxLevel) ? GameState.LEVEL_COMPLETE : GameState.WIN;
+            state = (currentLevel < GameConfig.MAX_LEVEL) ? GameState.LEVEL_COMPLETE : GameState.WIN;
         }
 
-        if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && now - lastShootTime >= shootCooldown) {
+        if (glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS && now - lastShootTime >= GameConfig.SHOOT_COOLDOWN) {
             bullets.add(player.shoot());
             lastShootTime = now;
         }
@@ -381,7 +370,7 @@ public class TankMazeGame {
 
     private void handleWin() {
         if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
-            if (currentLevel < maxLevel) {
+            if (currentLevel < GameConfig.MAX_LEVEL) {
                 currentLevel++;
                 startNewGame(currentLevel);
             } else {

@@ -5,12 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-/**
- * Original recursive-backtracker from your upskilling project,
- * unchanged except for package name.
- *
- * rows & cols should both be odd.
- */
 public class MazeGenerator {
     private final int rows;
     private final int cols;

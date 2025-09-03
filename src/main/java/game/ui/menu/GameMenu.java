@@ -18,6 +18,7 @@ import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
+import game.app.GameConfig;
 import game.audio.MusicPlayer;
 
 public class GameMenu extends JPanel implements ActionListener, SettingsChangeListener 
@@ -78,7 +79,7 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
         setLayout(null);
         if (mainMenu == null) mainMenu = this;
 
-        music.initResource("/audio/menu_music.wav");
+        music.initResource(GameConfig.MENU_MUSIC_PATH);
 
         // Buttons
         playButton     = createButton("Play",     300, 200);

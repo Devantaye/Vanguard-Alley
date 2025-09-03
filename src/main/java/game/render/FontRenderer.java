@@ -5,6 +5,8 @@ import org.lwjgl.stb.STBTTAlignedQuad;
 import org.lwjgl.stb.STBTTBakedChar;
 import org.lwjgl.system.MemoryStack;
 
+import game.app.GameConfig;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -21,7 +23,7 @@ public class FontRenderer {
 
     public FontRenderer() throws IOException {
         InputStream in = getClass().getClassLoader()
-            .getResourceAsStream("fonts/roboto.ttf");
+            .getResourceAsStream(GameConfig.FONT_PRIMARY);
         if (in == null) throw new IOException("Missing fonts/roboto.ttf");
         byte[] bytes = in.readAllBytes();
         ByteBuffer ttf = BufferUtils.createByteBuffer(bytes.length);

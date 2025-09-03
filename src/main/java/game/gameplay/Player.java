@@ -2,6 +2,8 @@ package game.gameplay;
 
 import org.joml.Vector2f;
 
+import game.app.GameConfig;
+
 public class Player {
     private final int[][] maze;
     private final int rows;
@@ -88,7 +90,7 @@ public class Player {
 }
 
 public Bullet shoot() {
-        return new Bullet(x, y, dir, maze, rows);
+        return new Bullet(x, y, dir, maze, rows, GameConfig.PLAYER_BULLET_SPEED);
     }
 
 /** Returns the player’s current world‐space position. */
