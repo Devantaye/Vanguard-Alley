@@ -7,6 +7,7 @@ public final class GameConfig {
   public static final int   WINDOW_WIDTH  = 800;
   public static final int   WINDOW_HEIGHT = 800;
   public static final int   MAZE_ROWS     = 21;   // must be odd 
+  public static final float SPAWN_MARGIN_CELLS = 6f;
 
   // ── Gameplay timing ───────────────────────────────────────────── 
   public static final double MOVE_INTERVAL   = 0.10; // sec between grid steps

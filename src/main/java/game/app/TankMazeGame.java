@@ -280,7 +280,7 @@ public class TankMazeGame {
 
     final int rows = GameConfig.MAZE_ROWS;
     final float cellSize = GameConfig.cellSize();
-    final float margin = GameConfig.cellsToWorld(6f);
+    final float margin = GameConfig.cellsToWorld(GameConfig.SPAWN_MARGIN_CELLS);
 
     int levelEnemyCount = (level == GameConfig.MAX_LEVEL)
         ? GameConfig.FINAL_LEVEL_BONUS_COUNT
