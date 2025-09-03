@@ -24,6 +24,7 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
     private JButton playButton, settingsButton, rulesButton, creditsButton, exitButton;
     private MusicPlayer music = new MusicPlayer();
     private static GameMenu mainMenu;
+    private final Runnable onStart;
         
     
  // Maze definition (28 rows x 36 cols, 1 = wall, 0 = path)
@@ -60,24 +61,21 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
     };
 
-
-    private final int cellSize = 30;
     private Tank player;
     private java.util.List<Tank> enemies = new ArrayList<>();
     private Random rand = new Random();
 
     private int brightnessLevel = 10;
 
-    public GameMenu() 
-    {
+    public GameMenu() {               
+        this(null);
+    }
+
+    public GameMenu(Runnable onStart) {   // ← NEW ctor
+        this.onStart = onStart;
         setLayout(null);
-        
-        if (mainMenu == null)
-        {
-            mainMenu = this;
-        }
-        
-        //music file
+        if (mainMenu == null) mainMenu = this;
+
         music.initResource("/audio/menu_music.wav");
 
         // Buttons
@@ -113,14 +111,13 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
         return btn;
     }
 
-    private void handleButtonClick(String buttonText) 
-    {
+    private void handleButtonClick(String buttonText) {
         JFrame parent = (JFrame) SwingUtilities.getWindowAncestor(this);
 
-        switch (buttonText) 
-        {
+        switch (buttonText) {
             case "Play":
-                System.out.println("Play the game!");
+                if (onStart != null) onStart.run();
+                if (parent != null) parent.dispose();
                 break;
 
             case "Settings":
@@ -131,33 +128,27 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
                 break;
 
             case "Rules":
-                Rules rulesPanel = new Rules(e -> 
-                {
+                Rules rulesPanel = new Rules(e -> {
                     // Go back to the menu
-                    parent.getContentPane().removeAll();
-                    parent.add(mainMenu);
+                    parent.setContentPane(mainMenu);
                     parent.revalidate();
                     parent.repaint();
                 });
 
-                parent.getContentPane().removeAll();
-                parent.add(rulesPanel);
+                parent.setContentPane(rulesPanel);
                 parent.revalidate();
                 parent.repaint();
                 break;
-                
-             case "Credits":
-                Credits creditsPanel = new Credits(e -> 
-                {
+
+            case "Credits":
+                Credits creditsPanel = new Credits(e -> {
                     // Go back to the menu
-                    parent.getContentPane().removeAll();
+                    parent.setContentPane(mainMenu);
                     parent.revalidate();
-                    parent.add(mainMenu);
                     parent.repaint();
                 });
 
-                parent.getContentPane().removeAll();
-                parent.add(creditsPanel);
+                parent.setContentPane(creditsPanel);
                 parent.revalidate();
                 parent.repaint();
                 break;
@@ -167,6 +158,7 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
                 break;
         }
     }
+
     
     @Override
     public void onVolumeChanged(int level) 
@@ -303,16 +295,7 @@ private void respawnPlayer()
         enemies.add(new Tank(c, r, Color.RED, false));
     }
 
-    public static void main(String[] args) 
-    {
-        JFrame frame = new JFrame("Vanguard Alley");
-        GameMenu mainMenu = new GameMenu();
-        frame.add(mainMenu);
-        frame.setSize(800, 600);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setResizable(false);
-        frame.setVisible(true);
-    }
+    public void stopAudio() { music.stop(); }
 
     // ================= Tank Class =================
     private class Tank 
