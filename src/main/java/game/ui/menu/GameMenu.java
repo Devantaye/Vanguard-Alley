@@ -28,7 +28,7 @@ public class GameMenu extends JPanel implements ActionListener, SettingsChangeLi
     private MusicPlayer music = new MusicPlayer();
     private static GameMenu mainMenu;
     private final Runnable onStart;
-        
+
     
  // Maze definition (28 rows x 36 cols, 1 = wall, 0 = path)
     private final int[][] maze = 
