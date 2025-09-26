@@ -3,14 +3,10 @@ package game.ui.menu;
 import javax.swing.*;
 
 import java.util.concurrent.CountDownLatch;
-import game.app.GameConfig;
-import game.audio.AudioPlayer;
 
 
 public final class PrelaunchMenu {
     private PrelaunchMenu() {}
-    private static AudioPlayer menuMusic;
-
 
     public static boolean showAndWait() {
         CountDownLatch latch = new CountDownLatch(1);

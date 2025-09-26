@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Rules",
+            "request": "launch",
+            "mainClass": "game.ui.menu.Rules",
+            "projectName": "TankPrototype"
+        },
+        {
+            "type": "java",
+            "name": "Credits",
+            "request": "launch",
+            "mainClass": "game.ui.menu.Credits",
+            "projectName": "TankPrototype"
+        },
+        {
+            "type": "java",
             "name": "TankMazeGame",
             "request": "launch",
             "mainClass": "game.app.TankMazeGame",
