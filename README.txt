@@ -1,41 +1,86 @@
-Tank Maze Game Prototype v2 - Leo & Devante
+Tank Maze Game - Vanguard Alley - RND Project 2025
 
-## Description  
-This is version 2 of our collaborative prototype, combining both our upskilling work into a playable 
-tank-based maze shooter game. This version focused on refining AI, adding new enemy behaviours, 
-improving visual feedback and increasing game complexity.
+## Short Descirption
+Vanguard Alley is a fast, grid-based tank maze game with *Gesture Controls* (Webcam + OpenCV). Navigate through mazes, dodge enemy fire
+and clear levels. 
+note: This project was developed for our Uni Paper: [Research and Development - Comp702/703]
 
-## Core Features (Similar to v1)
-1. Random Maze Generation – A fresh 21×21 maze is generated for every level.
-2. Player Movement – Control a white tank with W / A / S / D.
-3. Shooting – Fire bullets using F (with a cooldown).
-4. Level Progression –
-     > Defeat all enemies to unlock the exit.
-     > Advance through 5 levels, each increasing difficulty.
-5. Dynamic Visuals –
-     > Walls and enemies use different color palettes per level.
-     > Background subtly shifts to fit the theme.
+## Table of Contents NOTE: Add (#bracket) when section is complete
+[Overview](#Overview)
+[Features]
+[Screens/Flow]
+[Controls]
+[Requirements](#Requirements)
+[Build]
+[Run]
+[Configuration]
+[Project Structure]
+[Contributing]
+[Credits]
 
-## New Features
-1. Enemy Types - [Levels are formatted to highlight each enemy type]
-     > Default tank (Level 1) - Standard AI that roams and shoots.
-     > Tanky Enemy (Level 2) - High HP, takes 3 hits to kill, Bigger bullets = harder to dodge.
-     > Mini Tanks (Level 3) - Smaller tanks but move alot faster
-     > Sniper Tank (Level 4) - Stationary tanks that rotate vision, shoot very fast if player eneters corridor.
-     > All tanks (Level 5) - Roughly demonstrates what a level may look like in later stages of development.
-2. Visual Updates - All tank nozzles now scale with body size and stay visually connected
-3. Level 5 Rules - Max of 3 units per enemy type, all randomly gennerated.
-4. Added a "skip level" button to make testing alot easier [ N Key ] 
+## Overview
+- **Language:** Java
+- **Libraries:** LWJGL (OpenGL/GLFW), JavaCV/OpenCV
+- **Build:** Maven
+- **Platforms:** Desktop (Windows/macOS/Linux)
+- **Inputs:** Webcam + Optional Keyboard and mouse (For testing/Debugging purposes)
 
-## How to Run  
-1. Navigate to (./target) location and open CMD in the terminal 
-2. Run the command -> java -jar TankMazeGame-1.0-SNAPSHOT.jar  
-3. **Controls**:  
-   - **W / A / S / D** – Move the tank  
-   - **F** – Shoot in facing direction (subject to cooldown)  
-   - **SPACE** – Start or restart game  
-   - **N** - Skip a level (For testing purposes)
-   - **ESC** – Quit  
+## Features
+*Add features here*
+- gesture control
+- maze components etc
+
+## Screens/Flow
+1. **Prelaunch Menu** → Start/Settings
+2. **Demo** → TBD
+3. **Game** → Clear enemies, reach the exit, advance levels.
+4. **Win/Lose/Level Complete** → Overlays
+
+## Controls
+*Controls here*
+
+## Requirements
+ - **Java 11** (JDK)
+ - **Maven 3.9+**
+ - **Webcam** (Required for gestures)
+ - GPU Drivers that support OpenGL(LWJGL)
+
+ ## Build
+ *Add build here*
+
+## Run
+* Add run here*
+
+## Configuration
+*Config here*
+
+## Project Structure
+src/
+   main/
+      java/
+         game/
+            app/          # GameConfig.Java, GameState.java, TankmazeGame.java
+            audio/        # AudioPlayer.java, ClickSound.java, MusicPlayer.java
+            gameplay/     # Bullet,java, MazeGenerator,java, PathFinder.java, Player.java
+               enemies/   # Enemy.java, EnemySpawning.java, EnemyType.java, MiniEnemy.java, SniperEenemy.java, TankEnemy.java
+            input/        # GestureManager.java
+            render/       # AWTTextureUtil.java, FontRenderer.java, GameRenderer.java, LevelRenderer.java, LoseRenderer.java, WinRenderer.java
+            tutorial/     # TBD
+            ui/
+               menu/      # BrightnessPanel.java, Credits.java, GameMenu.java, PreLaunchMenu.java, Rules.java, SettingsChangeListener.java, SettingsDialog.java, VolumePanel.java
+            util/         # ResourceLoader.java
+         resources/
+            audio/        # click.wav, game_music.wav, menu_music.wav, music.wav
+            cascade/      # TBD (change with final ones)
+            fonts/        # ARCADECLASSIC.ttf, Arial.ttf, Roboto.ttf
+Additional files:         # pom.xml,  README.txt    
+
+## Contributing
+*Add contributing here*
+
+## Credits
+*Add credits here*
+
 
   
 
