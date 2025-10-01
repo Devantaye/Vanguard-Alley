@@ -17,7 +17,7 @@ public class GestureManager {
     static { Loader.load(opencv_java.class); }
 
     // Classpath resources (e.g., "/cascade/left.xml")
-    private final String leftRes, rightRes, upRes, downRes;
+    private final String leftRes, rightRes, upRes, downRes, shootRes; // <— added shootRes
     private final boolean showDebug;
 
     // Camera + conversion
@@ -33,11 +33,13 @@ public class GestureManager {
     private final AtomicBoolean right = new AtomicBoolean(false);
     private final AtomicBoolean up    = new AtomicBoolean(false);
     private final AtomicBoolean down  = new AtomicBoolean(false);
+    private final AtomicBoolean shoot = new AtomicBoolean(false);           // <— added
+    private final AtomicBoolean shootPulse = new AtomicBoolean(false);      // <— rising-edge pulse
 
     // Threads
     private ExecutorService pool;
     private Future<?> captureTask;
-    private Future<?> leftTask, rightTask, upTask, downTask;
+    private Future<?> leftTask, rightTask, upTask, downTask, shootTask;     // <— added
 
     // Tunables
     private final long targetCaptureIntervalMs = 30;  // ~33 FPS capture cap
@@ -50,25 +52,44 @@ public class GestureManager {
         private final int max;
         private final int onThreshold;
         private final AtomicBoolean out;
+        private final AtomicBoolean pulse;      // optional: set true on rising edge
+        private boolean lastOut = false;
+
         Debouncer(AtomicBoolean out, int max, int onThreshold) {
+            this(out, max, onThreshold, null);
+        }
+        Debouncer(AtomicBoolean out, int max, int onThreshold, AtomicBoolean pulse) {
             this.out = out;
             this.max = max;
             this.onThreshold = onThreshold;
+            this.pulse = pulse;
         }
         void update(boolean detected) {
             score += detected ? 2 : -1;        // rise fast, decay slow
             if (score < 0) score = 0;
             if (score > max) score = max;
-            out.set(score >= onThreshold);
+            boolean now = (score >= onThreshold);
+            out.set(now);
+            if (pulse != null && now && !lastOut) {
+                // Rising edge
+                pulse.set(true);
+            }
+            lastOut = now;
         }
     }
 
-    public GestureManager(String leftRes, String rightRes, String upRes, String downRes, boolean showDebug) {
+    public GestureManager(String leftRes, String rightRes, String upRes, String downRes, String shootRes, boolean showDebug) {
         this.leftRes = leftRes;
         this.rightRes = rightRes;
         this.upRes = upRes;
         this.downRes = downRes;
+        this.shootRes = shootRes;          // <— added
         this.showDebug = showDebug;
+    }
+
+    // Backwards-compat convenience ctor (if you don’t want shoot yet)
+    public GestureManager(String leftRes, String rightRes, String upRes, String downRes, boolean showDebug) {
+        this(leftRes, rightRes, upRes, downRes, null, showDebug);
     }
 
     public void start() throws FrameGrabber.Exception {
@@ -86,8 +107,9 @@ public class GestureManager {
         final String rightPath = extractResourceToTemp(rightRes);
         final String upPath    = extractResourceToTemp(upRes);
         final String downPath  = extractResourceToTemp(downRes);
+        final String shootPath = (shootRes != null ? extractResourceToTemp(shootRes) : null); // <— added
 
-        pool = Executors.newFixedThreadPool(5);
+        pool = Executors.newFixedThreadPool(6);
 
         // 1) Producer: keep latest frame fresh
         captureTask = pool.submit(() -> {
@@ -118,6 +140,11 @@ public class GestureManager {
         rightTask = pool.submit(worker(new Debouncer(right, 4, 3), new CascadeClassifier(rightPath)));
         upTask    = pool.submit(worker(new Debouncer(up,    4, 3), new CascadeClassifier(upPath)));
         downTask  = pool.submit(worker(new Debouncer(down,  4, 3), new CascadeClassifier(downPath)));
+
+        // Shoot worker (uses pulse on rising edge)
+        if (shootPath != null) {
+            shootTask = pool.submit(worker(new Debouncer(shoot, 4, 3, shootPulse), new CascadeClassifier(shootPath)));
+        }
     }
 
     private Runnable worker(Debouncer deb, CascadeClassifier classifier) {
@@ -145,6 +172,9 @@ public class GestureManager {
                     deb.update(false);
                 }
             }
+            // cleanup mats
+            gray.close();
+            detections.close();
         };
     }
 
@@ -152,6 +182,12 @@ public class GestureManager {
     public boolean isRight() { return right.get(); }
     public boolean isUp()    { return up.get();    }
     public boolean isDown()  { return down.get();  }
+    public boolean isShoot() { return shoot.get(); }                  // <— added
+
+    /** Returns true exactly once per detected shoot rising edge. */
+    public boolean consumeShootPulse() {                               // <— added
+        return shootPulse.getAndSet(false);
+    }
 
     public void stop() {
         try {
@@ -160,6 +196,7 @@ public class GestureManager {
             if (rightTask != null)   rightTask.cancel(true);
             if (upTask != null)      upTask.cancel(true);
             if (downTask != null)    downTask.cancel(true);
+            if (shootTask != null)   shootTask.cancel(true);           // <— added
             if (pool != null)        pool.shutdownNow();
             if (grabber != null)     grabber.stop();
         } catch (Exception ignored) {}

@@ -253,6 +253,7 @@ public class TankMazeGame {
             "/cascade/right.xml",
             "/cascade/up.xml",
             "/cascade/down.xml",
+            "/cascade/shoot.xml", // <— added
             true // set false to hide the webcam preview window
         );
         try {
@@ -363,6 +364,12 @@ public class TankMazeGame {
             bullets.add(player.shoot());
             lastShootTime = now;
         }
+
+        if (gestures != null && gestures.isShoot() && now - lastShootTime >= GameConfig.SHOOT_COOLDOWN) {
+            bullets.add(player.shoot());
+            lastShootTime = now;
+        }
+
     }
 
 
