@@ -32,10 +32,10 @@ public final class GameConfig {
   };
 
   // ── Assets (classpath: src/main/resources) ────────────────────── 
-  public static final String MUSIC_PATH      = "audio/music.wav";
-  public static final String MENU_MUSIC_PATH = "audio/menu_music.wav"; 
-  public static final String CLICK_SFX_PATH  = "audio/click.wav"; 
-  public static final String FONT_PRIMARY    = "fonts/roboto.ttf"; 
+  public static final String MUSIC_PATH      = "/audio/game_music.wav";
+  public static final String MENU_MUSIC_PATH = "/audio/menu_music.wav"; 
+  public static final String CLICK_SFX_PATH  = "/audio/click.wav"; 
+  public static final String FONT_PRIMARY    = "/fonts/roboto.ttf"; 
 
   // multipliers (1.0f = default bullet speed/size as per Bullet class)
   public static final float PLAYER_BULLET_SPEED = 1.0f;

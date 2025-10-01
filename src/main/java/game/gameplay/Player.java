@@ -102,6 +102,15 @@ public Bullet shoot() {
     public float getY()               { return y;      }
     public float getSize()            { return size;   }
     public Direction getDirection()   { return dir;    }
+
+    public void setPositionGrid(int c, int r, float cellSize) {
+    float halfCell = cellSize / 2f;
+    this.x = -1f + c * cellSize + halfCell;
+    this.y =  1f - r * cellSize - halfCell;
+}
+public void setPosition(float x, float y) { this.x = x; this.y = y; }
+
+
 }
 
 

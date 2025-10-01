@@ -6,6 +6,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "TutorialDemo",
+            "request": "launch",
+            "mainClass": "game.tutorial.TutorialDemo",
+            "projectName": "TankPrototype"
+        },
+        {
+            "type": "java",
             "name": "Rules",
             "request": "launch",
             "mainClass": "game.ui.menu.Rules",

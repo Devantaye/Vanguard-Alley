@@ -6,6 +6,7 @@ public enum GameState {
     WIN,
     LOSE,
     LEVEL_COMPLETE,
+    TUTORIAL,
 }
 
 

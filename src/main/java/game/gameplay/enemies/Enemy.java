@@ -35,12 +35,26 @@ public class Enemy {
     private final int      rows;
     private final float    cellSize;
     private float          size;
+    protected float x;
+    protected float y;
 
     // ── Path-following fields ──────────────────────────────────────────────
     private List<int[]> path        = Collections.emptyList();
     private int         pathIndex   = 0;
     private float       recalcTimer = 0f;
     private static final float RECALC_INTERVAL = 0.5f;
+
+    // ── Tutorial fields ────────────────────────────────────────────────────
+    private boolean tutorialFrozen = false;
+    public boolean isTutorialFrozen() { return tutorialFrozen; }
+    private boolean lockDir = false;
+    private game.gameplay.Player.Direction lockedDir = game.gameplay.Player.Direction.LEFT;
+    protected void applyLockedDirectionIfAny() { if (lockDir) direction = lockedDir; }
+    private boolean frozenAllowShoot = false;
+    private float frozenShootInterval = 1.2f; // seconds between shots when frozen
+    private float frozenShootTimer = 0f;
+
+
 
     public Enemy(float startX, float startY, int[][] maze, int health, float speed, float chaseRange, float shootRange) {
         this.position = new Vector2f(startX, startY);
@@ -70,32 +84,50 @@ public class Enemy {
 
 
     /** Actively chase the player at all times; shoot when in range. */
-    public void update(float dt, Player player, List<Bullet> outBullets) {
-        // 1) Recompute shortest path to the player on a cadence
-        recalcTimer -= dt;
-        if (recalcTimer <= 0f) {
-            recalcTimer = RECALC_INTERVAL;
-            int er = (int)((1 - position.y) / cellSize);
-            int ec = (int)((position.x + 1) / cellSize);
-            Vector2f pp = player.getPosition();
-            int pr = (int)((1 - pp.y) / cellSize);
-            int pc = (int)((pp.x + 1) / cellSize);
+    /** Actively chase the player at all times; shoot when in range. */
+public void update(float dt, Player player, List<Bullet> outBullets) {
+    // ── Tutorial freeze: block pathing/rotation/movement ─────────────
+    if (tutorialFrozen) {
+        if (lockDir) this.direction = lockedDir; // keep facing fixed
 
-            path = PathFinder.findPath(maze, er, ec, pr, pc);
-            pathIndex = 1; // skip current cell
+        // optional: allow slow shots while frozen
+        if (frozenAllowShoot) {
+            frozenShootTimer -= dt;
+            if (frozenShootTimer <= 0f) {
+                // fire once (use whatever your shoot logic does)
+                shoot(dt, player, outBullets);
+                frozenShootTimer = frozenShootInterval;
+            }
         }
-
-        // 2) Distance to player in cells (via path length)
-        int distCells = path.size() > 1 ? (path.size() - 1) : Integer.MAX_VALUE;
-
-        // 3) Always move toward the player
-        followPath(dt);
-
-        // 4) Shoot if in range (keep moving while shooting)
-        if (distCells * cellSize <= shootRange) {
-            shoot(dt, player, outBullets);
-        }
+        return; // IMPORTANT: no pathing, no followPath, no re-aiming
     }
+
+    // 1) Recompute shortest path to the player on a cadence
+    recalcTimer -= dt;
+    if (recalcTimer <= 0f) {
+        recalcTimer = RECALC_INTERVAL;
+        int er = (int)((1 - position.y) / cellSize);
+        int ec = (int)((position.x + 1) / cellSize);
+        Vector2f pp = player.getPosition();
+        int pr = (int)((1 - pp.y) / cellSize);
+        int pc = (int)((pp.x + 1) / cellSize);
+
+        path = PathFinder.findPath(maze, er, ec, pr, pc);
+        pathIndex = 1; // skip current cell
+    }
+
+    // 2) Distance to player in cells (via path length)
+    int distCells = path.size() > 1 ? (path.size() - 1) : Integer.MAX_VALUE;
+
+    // 3) Always move toward the player
+    followPath(dt);
+
+    // 4) Shoot if in range (keep moving while shooting)
+    if (distCells * cellSize <= shootRange) {
+        shoot(dt, player, outBullets);
+    }
+}
+
 
     /** Moves along the A* path, one cell at a time, and sets facing. */
     protected void followPath(float dt) {
@@ -215,9 +247,31 @@ public class Enemy {
         this.size = (2f / rows) * 0.2f * scale; // default size scaled
     }
 
-    protected void setDirection(Direction dir) {
+    public void setDirection(Direction dir) {
         this.direction = dir;
     }
+
+    public void setPosition(Float X, Float Y) {
+    this.x = X;
+    this.y = Y;
+}
+public void setTutorialFrozen(boolean frozen) {
+    this.tutorialFrozen = frozen;
+    this.frozenShootTimer = 0f; // reset so first shot respects the interval
+}
+
+public void setFrozenShoot(boolean allow, float intervalSec) {
+    this.frozenAllowShoot = allow;
+    this.frozenShootInterval = intervalSec;
+}
+
+public void lockDirection(game.gameplay.Player.Direction dir) {
+    this.lockDir = true;
+    this.lockedDir = dir;
+}
+public void unlockDirection() { this.lockDir = false; }
+
+
 
 }
 
