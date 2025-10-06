@@ -117,7 +117,7 @@ public class Rules extends JPanel
 
         int imgSize = 50;
         int gap = 20;
-        int startY = 130; // ✅ slightly lower to make room for headers
+        int startY = 130; //slightly lower to make room for headers
         int leftX = 50;
         int rightX = middleX + 70;
 
