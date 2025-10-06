@@ -165,7 +165,7 @@ public class Rules extends JPanel
             if (keyImg != null)
                 g2.drawImage(keyImg, rightX, startY - imgSize + 20, imgSize, imgSize, null);
 
-            g2.drawString(rule, rightX + imgSize + 10, startY); // ✅ text closer to keyboard
+            g2.drawString(rule, rightX + imgSize + 10, startY); //text closer to keyboard
 
             startY += 70;
         }
