@@ -63,7 +63,7 @@ public class Rules extends JPanel
         Graphics2D g2 = (Graphics2D) g;
 
         // Background
-        g2.setColor(new Color(70, 70, 70));
+        g2.setColor(Color.DARK_GRAY);
         g2.fillRect(0, 0, getWidth(), getHeight());
 
         // ===== Header =====
