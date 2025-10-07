@@ -1,4 +1,4 @@
-package com.example.gamemenu;
+package game.ui.menu;
 
 import java.awt.*;
 import java.awt.event.*;
