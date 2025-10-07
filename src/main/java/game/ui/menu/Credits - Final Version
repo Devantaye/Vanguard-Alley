@@ -1,4 +1,4 @@
-package com.example.gamemenu;
+package game.ui.menu;
 
 import javax.swing.*;
 import java.awt.*;
