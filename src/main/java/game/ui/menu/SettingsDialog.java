@@ -27,7 +27,7 @@ public class SettingsDialog extends JDialog
         top.add(volBtn);
 
         JPanel cards = new JPanel(new CardLayout());
-        volumepanel volPanel = new volumepanel(listener);
+        VolumePanel volPanel = new VolumePanel(listener);
         cards.add(volPanel, "VOLUME");
 
         volBtn.addActionListener(e ->

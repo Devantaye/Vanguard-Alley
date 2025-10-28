@@ -16,7 +16,7 @@ public final class GameConfig {
   // ── Levels & difficulty ───────────────────────────────────────── 
   public static final int MAX_LEVEL                 = 5;
   public static final int BASE_ENEMY_COUNT          = 2;   // enemies = base + level
-  public static final int FINAL_LEVEL_BONUS_COUNT   = 12;  // custom count for final 
+  public static final int FINAL_LEVEL_BONUS_COUNT   = 11;  // custom count for final 
 
   // ── Feature flags ─────────────────────────────────────────────── 
   public static final boolean ENABLE_GESTURES = true;
@@ -59,7 +59,7 @@ public final class GameConfig {
 
   // ── Enemy: MINI ───────────────────────────────────────────────── 
   public static final int    ENEMY_MINI_HEALTH        = 1;
-  public static final float  ENEMY_MINI_SPEED         = 0.45f;
+  public static final float  ENEMY_MINI_SPEED         = 0.22f;
   public static final float  ENEMY_MINI_CHASE_CELLS   = 4f;
   public static final float  ENEMY_MINI_SHOOT_CELLS   = 3f;
   public static final double ENEMY_MINI_FIRE_COOLDOWN = 0.70;
@@ -75,6 +75,11 @@ public final class GameConfig {
 
   public static final float SNIPER_BULLET_SPEED = 4.2f;
   public static final float SNIPER_BULLET_SIZE  = 0.6f;
+
+  // Global scan state (unchanged)
+    public static float GLOBAL_SCAN_TIMER = 0f;
+    public static final float SCAN_INTERVAL = 22f;
+    public static int GLOBAL_DIRECTION_INDEX = 0;
 
   // ── Helpers (kept minimal; not classes) ───────────────────────── 
   public static float cellSize()            { return 2f / MAZE_ROWS; }

@@ -10,11 +10,6 @@ import game.gameplay.Player.Direction;
 
 public class SniperEnemy extends Enemy {
 
-    // Global scan state (unchanged)
-    private static float GLOBAL_SCAN_TIMER = 0f;
-    private static final float SCAN_INTERVAL = 7f;
-    private static int GLOBAL_DIRECTION_INDEX = 0;
-
     // Behavior (use config for cooldown; keep aim delay here or add a constant)
     private static final float AIM_DELAY = 0.5f;
     private static final float SHOOT_COOLDOWN = (float) GameConfig.ENEMY_SNIPER_FIRE_COOLDOWN;
@@ -71,14 +66,14 @@ public class SniperEnemy extends Enemy {
 
         } else {
             // ✅ Only rotate if not aiming or shooting
-            GLOBAL_SCAN_TIMER += dt;
-            if (GLOBAL_SCAN_TIMER >= SCAN_INTERVAL) {
-                GLOBAL_SCAN_TIMER = 0f;
-                GLOBAL_DIRECTION_INDEX++;
+            GameConfig.GLOBAL_SCAN_TIMER += dt;
+            if ( GameConfig.GLOBAL_SCAN_TIMER >=  GameConfig.SCAN_INTERVAL) {
+                 GameConfig.GLOBAL_SCAN_TIMER = 0f;
+                 GameConfig.GLOBAL_DIRECTION_INDEX++;
             }
 
             if (!watchDirections.isEmpty()) {
-                int dirIndex = GLOBAL_DIRECTION_INDEX % watchDirections.size();
+                int dirIndex =  GameConfig.GLOBAL_DIRECTION_INDEX % watchDirections.size();
                 setDirection(watchDirections.get(dirIndex));
             }
 

@@ -23,7 +23,10 @@ public class MusicPlayer {
         stop(); // stop any previous clip
 
         // Look inside classpath (src/main/resources)
-        URL url = MusicPlayer.class.getResource(resourcePath);
+        String p = resourcePath.startsWith("/") ? resourcePath : "/" + resourcePath;
+        URL url = MusicPlayer.class.getResource(p);
+
+
         if (url == null) {
             System.err.println("Could not find resource: " + resourcePath);
             return;
