@@ -1,27 +1,28 @@
-# 🕹️ Tank Maze Game — *Vanguard Alley*  
-### 🎓 R&D Project 2025 | COMP702 / COMP703  
+# 🕹️ Tank Maze Game — *Vanguard Alley*
+### 🎓 R&D Project 2025 | COMP702 / COMP703
 
 > **Vanguard Alley** is a fast-paced, grid-based **tank maze game** powered by *gesture controls* (Webcam + OpenCV).  
-> Navigate mazes, dodge enemy fire, and clear each level through precision and quick thinking.  
+> Navigate mazes, dodge enemy fire, and clear each level through precision and quick thinking.
 
 ---
 
 ## 🧭 Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Screens / Flow](#screens--flow)
-- [Controls](#controls)
-- [Requirements](#requirements)
-- [Build](#build)
-- [Run](#run)
-- [Configuration](#configuration)
-- [Project Structure](#project-structure)
-- [Contributing](#contributing)
-- [Credits](#credits)
+- [Overview](#-overview)
+- [Features](#-features)
+- [Screens / Flow](#-screens--flow)
+- [Controls](#-controls)
+- [Requirements](#-requirements)
+- [Build](#-build)
+- [Run](#-run)
+- [Configuration](#-configuration)
+- [Project Structure](#-project-structure)
+- [Contributing](#-contributing)
+- [Credits](#-credits)
 
 ---
 
 ## 📘 Overview
+
 | Category | Details |
 |-----------|----------|
 | **Language** | Java |
@@ -83,8 +84,3 @@ cd Vanguard-Alley
 
 # Build using Maven
 mvn clean install
-
-
-  
-
-
