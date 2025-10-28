@@ -1,85 +1,88 @@
-Tank Maze Game - Vanguard Alley - RND Project 2025
+# 🕹️ Tank Maze Game — *Vanguard Alley*  
+### 🎓 R&D Project 2025 | COMP702 / COMP703  
 
-## Short Descirption
-Vanguard Alley is a fast, grid-based tank maze game with *Gesture Controls* (Webcam + OpenCV). Navigate through mazes, dodge enemy fire
-and clear levels. 
-note: This project was developed for our Uni Paper: [Research and Development - Comp702/703]
+> **Vanguard Alley** is a fast-paced, grid-based **tank maze game** powered by *gesture controls* (Webcam + OpenCV).  
+> Navigate mazes, dodge enemy fire, and clear each level through precision and quick thinking.  
 
-## Table of Contents NOTE: Add (#bracket) when section is complete
-[Overview](#Overview)
-[Features]
-[Screens/Flow]
-[Controls]
-[Requirements](#Requirements)
-[Build]
-[Run]
-[Configuration]
-[Project Structure]
-[Contributing]
-[Credits]
+---
 
-## Overview
-- **Language:** Java
-- **Libraries:** LWJGL (OpenGL/GLFW), JavaCV/OpenCV
-- **Build:** Maven
-- **Platforms:** Desktop (Windows/macOS/Linux)
-- **Inputs:** Webcam + Optional Keyboard and mouse (For testing/Debugging purposes)
+## 🧭 Table of Contents
+- [Overview](#overview)
+- [Features](#features)
+- [Screens / Flow](#screens--flow)
+- [Controls](#controls)
+- [Requirements](#requirements)
+- [Build](#build)
+- [Run](#run)
+- [Configuration](#configuration)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Credits](#credits)
 
-## Features
-*Add features here*
-- gesture control
-- maze components etc
+---
 
-## Screens/Flow
-1. **Prelaunch Menu** → Start/Settings
-2. **Demo** → TBD
-3. **Game** → Clear enemies, reach the exit, advance levels.
-4. **Win/Lose/Level Complete** → Overlays
+## 📘 Overview
+| Category | Details |
+|-----------|----------|
+| **Language** | Java |
+| **Libraries / Frameworks** | LWJGL (OpenGL / GLFW), JavaCV / OpenCV |
+| **Build Tool** | Maven |
+| **Supported Platforms** | Desktop — Windows, macOS, Linux |
+| **Input Methods** | Webcam (Gesture Control) + Optional Keyboard/Mouse (for debugging) |
 
-## Controls
-*Controls here*
+> 🧩 Developed as part of the **Research & Development** paper — AUT University, 2025.
 
-## Requirements
- - **Java 11** (JDK)
- - **Maven 3.9+**
- - **Webcam** (Required for gestures)
- - GPU Drivers that support OpenGL(LWJGL)
+---
 
- ## Build
- *Add build here*
+## ✨ Features
+- 🖐️ **Gesture Controls** — Perform in-game actions via real-time hand tracking.  
+- 🧱 **Dynamic Maze Generation** — Each run offers a new maze layout.  
+- 💥 **Enemy AI** — Multiple enemy types with unique behaviors and attack patterns.  
+- 🔊 **Audio System** — Background music and sound effects via `AudioPlayer` and `MusicPlayer`.  
+- 🧭 **HUD & UI** — Interactive menus, volume settings, and brightness adjustments.  
+- 💾 **Configurable Settings** — Adjustable difficulty, volume, and display options.  
 
-## Run
-* Add run here*
+---
 
-## Configuration
-*Config here*
+## 🧩 Screens / Flow
+1. **Pre-Launch Menu** → Start, Settings, Credits  
+2. **Demo / Tutorial Mode** → (Gesture introduction and testing area)  
+3. **Gameplay** → Navigate maze, clear enemies, reach exit  
+4. **Win / Lose / Level Complete Screens** → Display performance and next-level options  
 
-## Project Structure
-src/
-   main/
-      java/
-         game/
-            app/          # GameConfig.Java, GameState.java, TankmazeGame.java
-            audio/        # AudioPlayer.java, ClickSound.java, MusicPlayer.java
-            gameplay/     # Bullet,java, MazeGenerator,java, PathFinder.java, Player.java
-               enemies/   # Enemy.java, EnemySpawning.java, EnemyType.java, MiniEnemy.java, SniperEenemy.java, TankEnemy.java
-            input/        # GestureManager.java
-            render/       # AWTTextureUtil.java, FontRenderer.java, GameRenderer.java, LevelRenderer.java, LoseRenderer.java, WinRenderer.java
-            tutorial/     # TBD
-            ui/
-               menu/      # BrightnessPanel.java, Credits.java, GameMenu.java, PreLaunchMenu.java, Rules.java, SettingsChangeListener.java, SettingsDialog.java, VolumePanel.java
-            util/         # ResourceLoader.java
-         resources/
-            audio/        # click.wav, game_music.wav, menu_music.wav, music.wav
-            cascade/      # TBD (change with final ones)
-            fonts/        # ARCADECLASSIC.ttf, Arial.ttf, Roboto.ttf
-Additional files:         # pom.xml,  README.txt    
+---
 
-## Contributing
-*Add contributing here*
+## 🎮 Controls
 
-## Credits
-*Add credits here*
+| Action | Gesture / Key |
+|--------|----------------|
+| Move Forward | ✋ Hand Tilt Up / W |
+| Move Backward | ✋ Hand Tilt Down / S |
+| Turn Left | 👈 Hand Left / A |
+| Turn Right | 👉 Hand Right / D |
+| Shoot | ✊ Fist Close / Space |
+| Pause | 🖐️ Open Palm / Esc |
+
+> 🧠 Gestures processed via **OpenCV** using the `GestureManager` class.
+
+---
+
+## ⚙️ Requirements
+- **Java 11** (JDK)  
+- **Maven 3.9+**  
+- **Webcam** *(mandatory for gesture control)*  
+- **GPU Drivers** supporting **OpenGL (LWJGL)**  
+
+---
+
+## 🏗️ Build
+```bash
+# Clone the repository
+git clone https://github.com/<your-username>/Vanguard-Alley.git
+cd Vanguard-Alley
+
+# Build using Maven
+mvn clean install
 
 
   
